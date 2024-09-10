@@ -38,6 +38,16 @@ def load_data(file_path):
 data = load_data('datasampah1.csv')
 ipal_data = load_data('IPAL.csv')
 
+def assign_lat_lon(data):
+    if 'latitude' not in data.columns or 'longitude' not in data.columns:
+        num_rows = len(data)
+        default_lat = -6.2  # Example latitude for Jakarta
+        default_lon = 106.82  # Example longitude for Jakarta
+        data['latitude'] = [default_lat] * num_rows
+        data['longitude'] = [default_lon] * num_rows
+
+assign_lat_lon(ipal_data)
+
 # Function to generate plots based on user input
 def generate_plot(data, plot_type, x_column, y_column):
     plt.figure()
@@ -64,8 +74,6 @@ if st.button("Generate Plot"):
 
 # Display the map with IPAL data
 st.subheader("IPAL Coverage Map")
-ipal_data['latitude'] = [5.55, -8.65, -6.2, -7.8, -6.2]  # Example latitudes
-ipal_data['longitude'] = [95.32, 115.22, 106.13, 110.36, 106.82]  # Example longitudes
 layer = pdk.Layer(
     "ScatterplotLayer",
     ipal_data,
@@ -101,8 +109,8 @@ def generate_response(prompt, temperature=0.7):
 question = st.text_input("Ask a question or make a request:")
 if question:
     answer = generate_response(question)
-    st.session_state["responses"].append({"question": question, "answer": answer})
+    st.session_state.responses.append({"question": question, "answer": answer})
 
-for entry in reversed(st.session_state["responses"]):
+for entry in reversed(st.session_state.responses):
     st.write(f"**Q:** {entry['question']}\n**A:** {entry['answer']}")
     st.write("---")
