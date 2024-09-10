@@ -36,7 +36,7 @@ def load_data(file_path):
     return pd.read_csv(file_path)
 
 data = load_data('datasampah1.csv')
-ipal_data = load_data('IPAL.CSV')
+ipal_data = load_data('IPAL.csv')
 
 # Function to generate plots based on user input
 def generate_plot(data, plot_type, x_column, y_column):
