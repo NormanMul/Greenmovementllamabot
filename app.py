@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import pydeck as pdk
 import io
 
 # Set Streamlit page configuration
@@ -31,6 +32,7 @@ def load_data(file_path):
     return pd.read_csv(file_path)
 
 data = load_data('datasampah1.csv')
+ipal_data = load_data('IPAL.CSV')
 
 # Function to generate plots based on user input
 def generate_plot(data, plot_type, x_column, y_column):
@@ -66,9 +68,7 @@ y_column = st.selectbox("Select Y-axis data:", columns)
 if st.button("Generate Plot"):
     generate_plot(data, plot_type, x_column, y_column)
 
-if "responses" not in st.session_state:
-    st.session_state["responses"] = []
-
+# Function to generate responses using the Groq Llama API
 def generate_response(prompt, temperature=0.7):
     from groq import Groq
     client = Groq(api_key=api_key)
@@ -94,3 +94,17 @@ if question:
 for entry in reversed(st.session_state["responses"]):
     st.write(f"**Q:** {entry['question']}\n**A:** {entry['answer']}")
     st.write("---")
+
+# Display the map with IPAL data
+st.subheader("IPAL Coverage Map")
+ipal_data['latitude'] = [5.55, -8.65, -6.2, -7.8, -6.2]  # Placeholder coordinates
+ipal_data['longitude'] = [95.32, 115.22, 106.13, 110.36, 106.82]
+layer = pdk.Layer(
+    "ScatterplotLayer",
+    ipal_data,
+    get_position='[longitude, latitude]',
+    get_color='[200, 30, 0, 160]',
+    get_radius=100000,
+)
+view_state = pdk.ViewState(latitude=-2.8, longitude=118, zoom=4)
+st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view_state))
