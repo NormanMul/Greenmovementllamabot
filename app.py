@@ -32,13 +32,39 @@ def load_data(file_path):
 
 data = load_data('datasampah1.csv')
 
-# Function to prepare data as context for the AI
-def prepare_data_context(data):
-    return "\n".join([f"{row.Index}: {', '.join(map(str, row))}" for row in data.itertuples()])
+# Function to generate plots based on user input
+def generate_plot(data, plot_type, x_column, y_column):
+    if plot_type == 'Line':
+        plt.figure()
+        plt.plot(data[x_column], data[y_column], marker='o')
+        plt.title(f'Line Plot of {y_column} vs {x_column}')
+        plt.xlabel(x_column)
+        plt.ylabel(y_column)
+        st.pyplot(plt)
+    elif plot_type == 'Bar':
+        plt.figure()
+        plt.bar(data[x_column], data[y_column])
+        plt.title(f'Bar Plot of {y_column} vs {x_column}')
+        plt.xlabel(x_column)
+        plt.ylabel(y_column)
+        st.pyplot(plt)
+    elif plot_type == 'Scatter':
+        plt.figure()
+        plt.scatter(data[x_column], data[y_column])
+        plt.title(f'Scatter Plot of {y_column} vs {x_column}')
+        plt.xlabel(x_column)
+        plt.ylabel(y_column)
+        st.pyplot(plt)
+    plt.clf()  # Clear the plot figure to free up memory
 
-# Include a checkbox to display data if necessary
-if st.checkbox('Show CSV Data'):
-    st.write(data)
+# Plot configuration
+plot_type = st.selectbox("Choose the type of plot:", ["Line", "Bar", "Scatter"])
+columns = data.columns.tolist()
+x_column = st.selectbox("Select X-axis data:", columns)
+y_column = st.selectbox("Select Y-axis data:", columns)
+
+if st.button("Generate Plot"):
+    generate_plot(data, plot_type, x_column, y_column)
 
 if "responses" not in st.session_state:
     st.session_state["responses"] = []
@@ -46,14 +72,12 @@ if "responses" not in st.session_state:
 def generate_response(prompt, temperature=0.7):
     from groq import Groq
     client = Groq(api_key=api_key)
-    context = prepare_data_context(data.head(50))  # Sending only the first 50 rows as context
-    full_prompt = f"Based on the following data:\n{context}\n\nQuestion: {prompt}"
     try:
         response = client.chat.completions.create(
             model=model_options[selected_model],
             messages=[
-                {"role": "system", "content": "You are a helpful assistant equipped with the following data."},
-                {"role": "user", "content": full_prompt},
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt},
             ],
             temperature=temperature
         )
