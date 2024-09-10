@@ -36,31 +36,21 @@ def load_data(file_path):
     return pd.read_csv(file_path)
 
 data = load_data('datasampah1.csv')
-ipal_data = load_data('IPAL.csv')
+ipal_data = load_data('IPAL.CSV')
 
 # Function to generate plots based on user input
 def generate_plot(data, plot_type, x_column, y_column):
+    plt.figure()
     if plot_type == 'Line':
-        plt.figure()
         plt.plot(data[x_column], data[y_column], marker='o')
-        plt.title(f'Line Plot of {y_column} vs {x_column}')
-        plt.xlabel(x_column)
-        plt.ylabel(y_column)
-        st.pyplot(plt)
     elif plot_type == 'Bar':
-        plt.figure()
         plt.bar(data[x_column], data[y_column])
-        plt.title(f'Bar Plot of {y_column} vs {x_column}')
-        plt.xlabel(x_column)
-        plt.ylabel(y_column)
-        st.pyplot(plt)
     elif plot_type == 'Scatter':
-        plt.figure()
         plt.scatter(data[x_column], data[y_column])
-        plt.title(f'Scatter Plot of {y_column} vs {x_column}')
-        plt.xlabel(x_column)
-        plt.ylabel(y_column)
-        st.pyplot(plt)
+    plt.title(f'{plot_type} Plot of {y_column} vs {x_column}')
+    plt.xlabel(x_column)
+    plt.ylabel(y_column)
+    st.pyplot(plt)
     plt.clf()  # Clear the plot figure to free up memory
 
 # Plot configuration
@@ -71,6 +61,25 @@ y_column = st.selectbox("Select Y-axis data:", columns)
 
 if st.button("Generate Plot"):
     generate_plot(data, plot_type, x_column, y_column)
+
+# Display the map with IPAL data
+st.subheader("IPAL Coverage Map")
+ipal_data['latitude'] = [5.55, -8.65, -6.2, -7.8, -6.2]  # Example latitudes
+ipal_data['longitude'] = [95.32, 115.22, 106.13, 110.36, 106.82]  # Example longitudes
+layer = pdk.Layer(
+    "ScatterplotLayer",
+    ipal_data,
+    get_position='[longitude, latitude]',
+    get_color='[200, 30, 0, 160]',
+    get_radius=20000,
+)
+view_state = pdk.ViewState(
+    latitude=ipal_data['latitude'].mean(),
+    longitude=ipal_data['longitude'].mean(),
+    zoom=5,
+    pitch=50,
+)
+st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view_state))
 
 def generate_response(prompt, temperature=0.7):
     from groq import Groq
