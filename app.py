@@ -68,21 +68,38 @@ def generate_response(prompt, temperature=0.7):
 def parse_and_generate_graph(prompt):
     prompt = prompt.lower().strip()
     words = prompt.split()
+    
+    # Check if the necessary keywords are present in the prompt
+    if "plot" not in prompt or "dan" not in words:
+        st.error("Please specify the type of plot ('line', 'bar', 'scatter') and the columns for the plot using the word 'dan' between them (e.g., 'buat line plot Column1 dan Column2').")
+        return
+
     try:
-        x_axis = words[words.index("dan") - 1]
-        y_axis = words[words.index("dan") + 1]
-        graph_type = words[words.index("plot") - 1]
-        fig, ax = plt.subplots()
-        if graph_type == "line":
-            ax.plot(data[x_axis], data[y_axis])
-        elif graph_type == "bar":
-            ax.bar(data[x_axis], data[y_axis])
-        elif graph_type == "scatter":
-            ax.scatter(data[x_axis], data[y_axis])
-        ax.set_title(f"{graph_type.title()} Plot of {y_axis} vs {x_axis}")
-        st.pyplot(fig)
-    except Exception as e:
-        st.error(f"Error generating graph: {e}")
+        dan_index = words.index("dan")
+        x_axis = words[dan_index - 1]
+        y_axis = words[dan_index + 1]
+        plot_index = words.index("plot")
+        graph_type = words[plot_index - 1]
+    except (ValueError, IndexError):
+        st.error("Error parsing input. Make sure the format is correct: 'buat <type> plot <Column1> dan <Column2>'.")
+        return
+
+    if x_axis not in data.columns or y_axis not in data.columns:
+        st.error("The specified columns do not exist in the data. Please check the column names and try again.")
+        return
+
+    # Generate the graph
+    st.subheader(f"{graph_type.title()} Plot of {y_axis} vs {x_axis}")
+    fig, ax = plt.subplots()
+    if graph_type == "line":
+        ax.plot(data[x_axis], data[y_axis])
+    elif graph_type == "bar":
+        ax.bar(data[x_axis], data[y_axis])
+    elif graph_type == "scatter":
+        ax.scatter(data[x_axis], data[y_axis])
+    ax.set_title(f"{graph_type.title()} Plot of {y_axis} vs {x_axis}")
+    st.pyplot(fig)
+    plt.close(fig)
 
 # User input processing
 question = st.text_input("Ask a question or make a request (e.g., 'buat line plot Column1 dan Column2'):")
