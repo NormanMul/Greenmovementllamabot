@@ -41,8 +41,8 @@ ipal_data = load_data('IPAL.csv')
 def assign_lat_lon(data):
     if 'latitude' not in data.columns or 'longitude' not in data.columns:
         num_rows = len(data)
-        default_lat = -6.2  # Example latitude for Jakarta
-        default_lon = 106.82  # Example longitude for Jakarta
+        default_lat = 13.7  # Example latitude for the Mekong River region
+        default_lon = 108.0  # Example longitude for the Mekong River region
         data['latitude'] = [default_lat] * num_rows
         data['longitude'] = [default_lon] * num_rows
 
@@ -84,7 +84,7 @@ layer = pdk.Layer(
 view_state = pdk.ViewState(
     latitude=ipal_data['latitude'].mean(),
     longitude=ipal_data['longitude'].mean(),
-    zoom=5,
+    zoom=7,
     pitch=50,
 )
 st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view_state))
