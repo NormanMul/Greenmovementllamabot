@@ -78,7 +78,7 @@ layer = pdk.Layer(
     "ScatterplotLayer",
     ipal_data,
     get_position='[longitude, latitude]',
-    get_color='[200, 30, 0, 160]',
+    get_color='[255, 0, 0, 160]',  # RGB color code for red
     get_radius=20000,
 )
 view_state = pdk.ViewState(
