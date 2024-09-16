@@ -41,8 +41,8 @@ ipal_data = load_data('IPAL.csv')
 def assign_lat_lon(data):
     if 'latitude' not in data.columns or 'longitude' not in data.columns:
         num_rows = len(data)
-        default_lat = 13.7  # Example latitude for the Mekong River region
-        default_lon = 108.0  # Example longitude for the Mekong River region
+        default_lat = 18.0  # Latitude for Mekong River in Laos
+        default_lon = 105.0  # Longitude for Mekong River in Laos
         data['latitude'] = [default_lat] * num_rows
         data['longitude'] = [default_lon] * num_rows
 
